@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filament PHP - 生產力加速器 演講大綱</title>
+    <!-- 載入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 設定 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Microsoft JhengHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 確保字體在中文環境下正確顯示 */
+        body {
+            font-family: 'Inter', 'Microsoft JhengHei', 'sans-serif';
+            background-color: #f7f9fb;
+        }
+        .section-header {
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .section-header:hover {
+            background-color: #e0e7ff; /* light blue hover */
+        }
+        .content-block {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            padding: 0 1rem;
+        }
+        .content-block.active {
+            max-height: 1000px; /* 足夠大的數值 */
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .rotate-90 {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
+        
+        <!-- 演講標題 -->
+        <header class="bg-indigo-600 text-white p-6 sm:p-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold mb-2">Filament PHP：Laravel 生產力加速器</h1>
+            <p class="text-indigo-200 text-lg">結構化大綱導覽 - 點擊區塊展開內容</p>
+            <p class="text-sm text-indigo-300 mt-2">總演講時間：15 - 25 分鐘 (講解與演示各約 50%)</p>
+        </header>
+
+        <main class="p-4 sm:p-6 space-y-8">
+            
+            <!-- 第一部分：解釋 (50%) -->
+            <section id="explanation-section" class="border border-indigo-200 rounded-xl overflow-hidden">
+                <div class="bg-indigo-100 p-4 sm:p-5">
+                    <h2 class="text-2xl font-bold text-indigo-800">
+                        <span class="mr-3">💡</span> 第一部分：解釋與原理 (預計 8-12 分鐘)
+                    </h2>
+                </div>
+                
+                <div class="p-4 space-y-3">
+                    <!-- 1. 是什麼? -->
+                    <div class="accordion-item bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="section-header p-4 flex justify-between items-center text-lg font-semibold text-gray-700 hover:text-indigo-600" data-target="what-is">
+                            <span>1. 什麼是 Filament？(What is it?)</span>
+                            <span class="toggle-icon transition-transform duration-200">▶</span>
+                        </div>
+                        <div id="what-is" class="content-block bg-white text-gray-600">
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>**定義：** 一個基於 Livewire 的 **Server-Driven UI (SDUI)** 框架。</li>
+                                <li>**TALL Stack 核心組件：** Livewire (動態互動)、Alpine.js (輕量JS)、Tailwind CSS (樣式)。</li>
+                                <li>**開發模式：** 用 **PHP Fluent API** 定義 UI 介面，而非傳統的 Blade 模板切版。</li>
+                                <li>**核心套件：** Panel Builder, Form Builder, Table Builder, Infolist Builder, Notifications。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 2. 為什麼? -->
+                    <div class="accordion-item bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="section-header p-4 flex justify-between items-center text-lg font-semibold text-gray-700 hover:text-indigo-600" data-target="why-use">
+                            <span>2. 為什麼要用 Filament？(Why?)</span>
+                            <span class="toggle-icon transition-transform duration-200">▶</span>
+                        </div>
+                        <div id="why-use" class="content-block bg-white text-gray-600">
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>**極致生產力：** 大幅減少前端工作，將開發時間從數天縮短到數小時。</li>
+                                <li>**統一 UI/UX：** 提供美觀、現代且響應式的管理面板介面，開箱即用。</li>
+                                <li>**PHP 開發體驗：** 完全用 PHP 處理前端邏輯，Laravel 開發者學習門檻極低。</li>
+                                <li>**內建功能完整：** CRUD、搜尋、排序、過濾、批量操作、表單驗證、通知... 等一應俱全。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 3. 怎麼用? -->
+                    <div class="accordion-item bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="section-header p-4 flex justify-between items-center text-lg font-semibold text-gray-700 hover:text-indigo-600" data-target="how-to">
+                            <span>3. Filament 怎麼用？(How to use?)</span>
+                            <span class="toggle-icon transition-transform duration-200">▶</span>
+                        </div>
+                        <div id="how-to" class="content-block bg-white text-gray-600">
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>**安裝與設定：** Composer 安裝，執行 `php artisan filament:install`。</li>
+                                <li>**核心概念 - Resource：** 透過 `php artisan make:filament-resource ModelName` 建立資源。</li>
+                                <li>**資源定義：** 在 Resource Class 中，分別定義 `form()` (表單) 和 `table()` (表格) 靜態方法。</li>
+                                <li>**Fluent API 應用：** 使用鏈式呼叫來配置組件，例如：<br> `TextInput::make('name')->required()->maxLength(255)`。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 4. 適合情境與注意事項 -->
+                    <div class="accordion-item bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="section-header p-4 flex justify-between items-center text-lg font-semibold text-gray-700 hover:text-indigo-600" data-target="scenarios">
+                            <span>4. 適合情境與注意事項</span>
+                            <span class="toggle-icon transition-transform duration-200">▶</span>
+                        </div>
+                        <div id="scenarios" class="content-block bg-white text-gray-600">
+                            <h4 class="font-bold text-gray-800 mb-1">✅ 適合情境 (40% ~ 50% 比例)</h4>
+                            <ul class="list-disc pl-5 space-y-1 mb-3">
+                                <li>**後台管理系統 (Admin Panel)**、**CRM**、**SaaS 內部工具**。</li>
+                                <li>**大量、重複性的 CRUD、Table 功能**。</li>
+                                <li>**對 UI/UX 有要求**，但**幾乎不需實作 JS 或 Blade 切版需求**。</li>
+                            </ul>
+                            <h4 class="font-bold text-gray-800 mb-1">⚠️ 使用注意事項 (Caveats)</h4>
+                            <ul class="list-disc pl-5 space-y-1 text-red-600">
+                                <li>**非 Laravel 官方套件：** 雖然基於 Livewire，但本身為第三方開源，使用時需注意版本兼容性與 API 變動。</li>
+                                <li>**客製化挑戰：** 脫離標準流程 (Happy Path) 的高度客製化，可能需要深入 Livewire 進行處理。</li>
+                                <li>**學習 Livewire：** 雖然 Filament 封裝了 Livewire，但要進行進階客製化仍需了解 Livewire 的生命週期。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第二部分：演示 (50%) -->
+            <section id="demo-section" class="border border-indigo-200 rounded-xl overflow-hidden">
+                <div class="bg-indigo-100 p-4 sm:p-5">
+                    <h2 class="text-2xl font-bold text-indigo-800">
+                        <span class="mr-3">🚀</span> 第二部分：實戰演示與對比 (預計 7-13 分鐘)
+                    </h2>
+                </div>
+
+                <div class="p-4 space-y-3">
+                    
+                    <!-- 5. 實作對比 -->
+                    <div class="accordion-item bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="section-header p-4 flex justify-between items-center text-lg font-semibold text-gray-700 hover:text-indigo-600" data-target="crud-comparison">
+                            <span>5. 核心對比：三種 CRUD 實作差異</span>
+                            <span class="toggle-icon transition-transform duration-200">▶</span>
+                        </div>
+                        <div id="crud-comparison" class="content-block bg-white text-gray-600">
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>**傳統 Laravel + Blade 實作 CRUD：**<br> (需要：Controller, Route, Request, Blade 模板, Form 處理, 手動實現分頁/排序)。</li>
+                                <li>**一般 Livewire 實作一個 CRUD：**<br> (需要：單一 Component, Livewire 互動邏輯, **手動撰寫全部 HTML/CSS**)。</li>
+                                <li>**Filament 實作一個 CRUD (Resource)：**<br> (需要：`make:filament-resource`, **純 PHP 定義欄位/表格**，UI 自動生成)。</li>
+                                <li>**結論：** Filament 將 Livewire 的潛力推向極致，專注於資料結構而非 UI 呈現。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 6. Filament 客製化與範例 -->
+                    <div class="accordion-item bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="section-header p-4 flex justify-between items-center text-lg font-semibold text-gray-700 hover:text-indigo-600" data-target="customization-examples">
+                            <span>6. Filament 客製化與範例展示</span>
+                            <span class="toggle-icon transition-transform duration-200">▶</span>
+                        </div>
+                        <div id="customization-examples" class="content-block bg-white text-gray-600">
+                            <h4 class="font-bold text-gray-800 mb-1">🛠️ 客製化 (Customization)</h4>
+                            <ul class="list-disc pl-5 space-y-1 mb-3">
+                                <li>**Table 客製化：** 實作 `Filter` (過濾器), `Bulk Action` (批量刪除/狀態修改), `Custom Column` (自定義顯示內容)。</li>
+                                <li>**Form 客製化：** 實作 `Conditionals` (條件性欄位顯示/隱藏), 使用 `Select::relationship()` 處理關聯資料。</li>
+                                <li>**客製化 Livewire 頁面：** 當預設 Resource 不夠用時，可建立 `php artisan make:filament-page`，並在其中嵌入 Form/Table Builder。</li>
+                            </ul>
+                            <h4 class="font-bold text-gray-800 mb-1">🖼️ 部分範例展示 (Demo)</h4>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>展示 **Rich Editor**、**FileUpload** 等進階 Form Fields。</li>
+                                <li>展示 **Infolist** (唯讀資料) 的美觀排版。</li>
+                                <li>展示 **Dashboard Widget** 製作一個簡單的統計圖表。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- 底部連結 -->
+        <footer class="p-6 sm:p-8 border-t border-gray-100 text-center text-sm text-gray-500">
+            <p>參考資源：</p>
+            <p class="mt-1 space-x-4">
+                <a href="https://filamentphp.com/docs/4.x/introduction/overview" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium">Filament 官方文件</a>
+                <span>|</span>
+                <a href="https://livewire.laravel.com/" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium">Laravel Livewire</a>
+            </p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('.accordion-item');
+
+            sections.forEach(item => {
+                const header = item.querySelector('.section-header');
+                const targetId = header.getAttribute('data-target');
+                const content = document.getElementById(targetId);
+                const icon = header.querySelector('.toggle-icon');
+
+                header.addEventListener('click', () => {
+                    // 檢查是否已展開
+                    const isActive = content.classList.contains('active');
+
+                    // 關閉所有展開的區塊
+                    document.querySelectorAll('.content-block.active').forEach(openContent => {
+                        openContent.classList.remove('active');
+                        openContent.closest('.accordion-item').querySelector('.toggle-icon').classList.remove('rotate-90');
+                    });
+
+                    // 如果原本是關閉的，則展開當前區塊
+                    if (!isActive) {
+                        content.classList.add('active');
+                        icon.classList.add('rotate-90');
+                    }
+                    // 如果原本是展開的，則保持關閉 (因為上面已經全部關閉)
+                });
+            });
+        });
+    </script>
+</body>
+</html>
