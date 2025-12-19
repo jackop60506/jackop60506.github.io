@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenRTB 廣告技術全書 - 權威指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+        :root { 
+            --cf-red: #E31C22; 
+            --dark-bg: #0b1120; 
+            --slate-soft: #f1f5f9; 
+            --gold: #fbbf24;
+            --tech-blue: #38bdf8;
+        }
+        body { font-family: 'Noto Sans TC', sans-serif; color: #1e293b; background: var(--slate-soft); overflow: hidden; }
+        
+        /* 側邊欄樣式 */
+        .sidebar { width: 340px; height: 100vh; background: var(--dark-bg); position: fixed; left: 0; top: 0; padding: 2rem 1rem; z-index: 50; box-shadow: 10px 0 30px rgba(0,0,0,0.3); overflow-y: auto; }
+        .sidebar-brand { display: flex; align-items: center; gap: 15px; margin-bottom: 2rem; border-bottom: 1px solid #1e293b; padding-bottom: 1.5rem; }
+        .sidebar-brand .logo { background: var(--cf-red); color: white; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-weight: 900; border-radius: 12px; font-size: 1.4rem; box-shadow: 0 0 15px rgba(227,28,34,0.4); }
+        
+        .nav-label { color: #475569; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; margin: 1.5rem 0 0.5rem 1rem; }
+        .menu-item { color: #94a3b8; padding: 0.75rem 1rem; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 12px; }
+        .menu-item:hover { background: #1e293b; color: white; transform: translateX(5px); }
+        .menu-item.active { background: linear-gradient(90deg, var(--cf-red), #9b1c1c); color: white; font-weight: 700; }
+
+        /* 主內容區 */
+        .main-content { margin-left: 340px; height: 100vh; overflow-y: auto; padding: 0; scroll-behavior: smooth; }
+        .step-section { display: none; padding: 4rem 5rem; max-width: 1300px; margin: 0 auto; }
+        .step-section.active { display: block; animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 卡片與元件 */
+        .glass-card { background: white; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.02); padding: 3.5rem; margin-bottom: 4rem; position: relative; }
+        .h2-title { font-size: 2.8rem; font-weight: 900; margin-bottom: 2.5rem; color: #0f172a; border-left: 12px solid var(--cf-red); padding-left: 2rem; line-height: 1.2; }
+        .h3-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem; color: #1e293b; display: flex; align-items: center; gap: 15px; }
+        
+        .badge-theory { background: #fef3c7; color: #d97706; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; }
+        .badge-practice { background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; }
+
+        .theory-box { background: #f8fafc; border-radius: 16px; padding: 2rem; border: 1px solid #e2e8f0; margin: 2rem 0; }
+        .ref-box { background: #f1f5f9; border-radius: 12px; padding: 1.5rem; border-left: 4px solid #64748b; margin-top: 2rem; }
+        .detail-text { line-height: 1.8; color: #475569; font-size: 1.05rem; }
+        .detail-text p { margin-bottom: 1.25rem; }
+
+        /* 程式碼與 JSON */
+        .json-display { background: #0b1120; border-radius: 16px; padding: 1.5rem; font-family: 'Consolas', monospace; font-size: 13px; color: #94a3b8; line-height: 1.5; border: 1px solid #1e293b; margin: 1.5rem 0; }
+        .json-display b { color: #f87171; }
+        .json-display i { color: #38bdf8; font-style: normal; }
+        
+        /* 側邊欄滾動條自定義 */
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+
+        .timeline-step { position: relative; padding-left: 3rem; margin-bottom: 3rem; }
+        .timeline-step::before { content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 100%; background: #e2e8f0; }
+        .timeline-circle { position: absolute; left: -9px; top: 0; width: 20px; height: 20px; background: white; border: 4px solid var(--cf-red); border-radius: 50%; }
+
+        /* 流程圖樣式 */
+        .diagram-container { background: #f1f5f9; border-radius: 20px; padding: 2rem; margin: 2rem 0; border: 1px solid #cbd5e1; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo">RTB</div>
+            <div class="text-white font-black text-xl">OPENRTB BIBLE</div>
+        </div>
+
+        <div class="nav-label">理論與定義 (Basics)</div>
+        <div class="menu-item active" onclick="showStep(1)"><i class="fa-solid fa-graduation-cap"></i> 核心定義與架構</div>
+        <div class="menu-item" onclick="showStep(2)"><i class="fa-solid fa-clock-rotate-left"></i> 交易演進史深度解析</div>
+
+        <div class="nav-label">產業應用 (Application)</div>
+        <div class="menu-item" onclick="showStep(3)"><i class="fa-solid fa-building-columns"></i> 應用一：ADX 交易所型</div>
+        <div class="menu-item" onclick="showStep(4)"><i class="fa-solid fa-network-wired"></i> 應用二：基礎交易型</div>
+
+        <div class="nav-label">實戰與開發 (Engineering)</div>
+        <div class="menu-item" onclick="showStep(5)"><i class="fa-solid fa-microchip"></i> 實戰：物件模型詳解</div>
+        <div class="menu-item" onclick="showStep(6)"><i class="fa-solid fa-file-shield"></i> 實戰：反欺詐與信任鏈</div>
+        <div class="menu-item" onclick="showStep(7)"><i class="fa-solid fa-gauge-high"></i> 實戰：高效能串接指南</div>
+        <div class="menu-item" onclick="showStep(8)"><i class="fa-solid fa-terminal"></i> 實戰：即時競價模擬</div>
+    </aside>
+
+    <main class="main-content">
+        
+        <!-- STEP 1: 核心定義 -->
+        <section id="step-1" class="step-section active">
+            <h2 class="h2-title">核心理論：OpenRTB 的本質與技術邊界</h2>
+            
+            <div class="glass-card">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="h3-title m-0">一、簡述：什麼是 OpenRTB？</h3>
+                    <span class="badge-theory">Theory Part 1</span>
+                </div>
+                <p class="text-lg font-medium text-slate-800 mb-6">
+                    OpenRTB (Open Real-Time Bidding) 是一套由 IAB Tech Lab 定義的數位廣告通訊標準，旨在解決買賣雙方在 100 毫秒內的「自動化叫價」問題。
+                </p>
+
+                <div class="theory-box">
+                    <h4 class="font-bold text-slate-700 mb-3 border-b pb-2">二、詳細敘述：技術與經濟學的交織</h4>
+                    <div class="detail-text">
+                        <p>
+                            從技術層面來看，OpenRTB 本質上是基於 <strong>JSON Over HTTP</strong> 的數據交換格式。它將現實世界的「廣告版位」、「用戶行為」與「設備特徵」高度抽象化為程式碼可讀的物件模型（Object Model）。
+                        </p>
+                        <p>
+                            在經濟學層面，它實現了<strong>完全競爭市場</strong>的雛形。透過開放標準，任何媒體（Publisher）的流量都能夠在毫秒級別內被全世界的廣告預算所檢索。它包含兩大核心流程：
+                        </p>
+                        <ul class="list-disc pl-6 space-y-3 mb-6">
+                            <li><strong>Bid Request：</strong> 由媒體端發起，內容包含「我在哪裡、誰在看我、我有什麼版位、底價是多少」。</li>
+                            <li><strong>Bid Response：</strong> 由買方回應，內容包含「我要出多少錢、我要播什麼素材、如果我贏了請通知這個網址」。</li>
+                        </ul>
+                        <p>
+                            這套標準的存在，避免了數位廣告陷入「技術孤島」，讓數千家技術服務商得以在同一套語法下進行全球化運作。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-6 bg-blue-50 rounded-2xl border-l-8 border-blue-500">
+                    <h4 class="font-black text-blue-900 mb-2">💡 技術視角關鍵點：</h4>
+                    <p class="text-sm text-blue-800">
+                        OpenRTB 並不處理廣告的「渲染 (Rendering)」，它只負責「商務搓合 (Matching)」。渲染是由 VAST (影音) 或 MRAID (行動) 等其他 IAB 標準處理。
+                    </p>
+                </div>
+
+                <div class="ref-box">
+                    <h5 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest"><i class="fa-solid fa-book-bookmark mr-2"></i> 參考文件與規範</h5>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://iabtechlab.com/standards/openrtb/" target="_blank" class="hover:text-blue-600 underline">IAB Tech Lab - OpenRTB 官方標準首頁</a></li>
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://www.iab.com/guidelines/real-time-bidding-rtb-project/" target="_blank" class="hover:text-blue-600 underline">IAB RTB Project Overview</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2: 演進史 -->
+        <section id="step-2" class="step-section">
+            <h2 class="h2-title">歷史進程：從手動排序到極致自動化</h2>
+            <div class="glass-card">
+                <div class="timeline-step">
+                    <div class="timeline-circle"></div>
+                    <h3 class="h3-title">2000s：瀑布流 (Waterfall) 的線性侷限</h3>
+                    <div class="detail-text">
+                        <p><strong>簡述：</strong> 這是基於優先順序的「排隊叫價」。</p>
+                        <p><strong>深度分析：</strong> 媒體設定固定的優先權，系統按順序詢問 A、B、C 網路。缺點在於「資訊不對稱」，後排的出價者即使願意出 10 倍價格，只要前排有人填補，後排連出價機會都沒有。這導致媒體收益損失慘重。當時缺乏統一協議，整合成本極高。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-step">
+                    <div class="timeline-circle"></div>
+                    <h3 class="h3-title">2010：OpenRTB 1.0 誕生與標準化開端</h3>
+                    <div class="detail-text">
+                        <p><strong>簡述：</strong> IAB 正式將競價格式標準化，確立了「廣告即數據」的觀念。</p>
+                        <p><strong>深度分析：</strong> 初期是為了解決 Ad Exchange (如 DoubleClick) 與多個 DSP 串接的開發成本問題。它確立了 Imp (曝光物件) 與 Device (設備物件) 的基本結構。這一時期，廣告界開始從「買廣告版位」轉向「買特定用戶曝光 (Audience Buying)」。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-step">
+                    <div class="timeline-circle"></div>
+                    <h3 class="h3-title">2012 - 2014：2.x 時代與行動端爆發</h3>
+                    <div class="detail-text">
+                        <p><strong>簡述：</strong> OpenRTB 2.0-2.2 引入了對 App 與 Location 的深度支持。</p>
+                        <p><strong>深度分析：</strong> 隨著智慧型手機普及，標準加入了 IFA (廣告主識別碼) 以及精準地理位置物件 (Geo Object)。這使得 LBS 廣告與 App 內原生廣告能夠大規模自動化交易。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-step">
+                    <div class="timeline-circle"></div>
+                    <h3 class="h3-title">2015 - 2020：Header Bidding 與 2.5 版本的繁榮</h3>
+                    <div class="detail-text">
+                        <p><strong>簡述：</strong> 打破瀑布流，實現真正的「並行競價」。</p>
+                        <p><strong>深度分析：</strong> OpenRTB 2.5 成為了歷史上最穩定的版本。它支援了 Native (原生廣告) 與更複雜的影音 VAST。在此時期，流量從「線性詢問」變成「並行廣播」，這對網路頻寬與 QPS 處理能力提出了極高挑戰，這也是 Header Bidding (標頭競價) 徹底顛覆媒體收益結構的時期。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-step">
+                    <div class="timeline-circle"></div>
+                    <h3 class="h3-title">2021+：3.0 時代、隱私與信任鏈 (Schain)</h3>
+                    <div class="detail-text">
+                        <p><strong>簡述：</strong> 追求極致透明度，應對隱私政策變化。</p>
+                        <p><strong>深度分析：</strong> 3.0 版本重新設計了物件模型（AdCOM），將「傳輸層」與「物件層」分離。同時，為了打擊廣告欺詐，強制推行 ads.txt、Schain 與 Ads.cert，確保每一分廣告預算都能追蹤到真實的媒體來源。</p>
+                    </div>
+                </div>
+
+                <div class="ref-box">
+                    <h5 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest"><i class="fa-solid fa-book-bookmark mr-2"></i> 參考文件與規範</h5>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://github.com/InteractiveAdvertisingBureau/OpenRTB" target="_blank" class="hover:text-blue-600 underline">OpenRTB GitHub Repository (所有歷史版本變動紀錄)</a></li>
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://adprofs.co/comprehensive-guide-to-header-bidding/" target="_blank" class="hover:text-blue-600 underline">Header Bidding 進程演進指南</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 3: ADX 應用 -->
+        <section id="step-3" class="step-section">
+            <h2 class="h2-title">應用模式一：標準交易所型 (ADX)</h2>
+            <div class="glass-card">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="px-4 py-1 bg-red-100 text-red-600 rounded-lg font-black text-sm">典型代表：Google AdX, Magnite</div>
+                </div>
+                
+                <h3 class="h3-title">一、簡述：公開市場的「拍賣槌」</h3>
+                <p class="detail-text mb-8">
+                    ADX 是 OpenRTB 最完整、最嚴謹的應用場景。它連接了數百家 SSP 與數千家 DSP，每一筆流量都進入「公開拍賣 (Open Auction)」。
+                </p>
+
+                <div class="diagram-container">
+                    <h4 class="text-xs font-bold text-slate-500 mb-4 text-center uppercase tracking-widest">ADX 交易拓撲架構圖</h4>
+                    <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg" class="w-full">
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                                <path d="M0,0 L10,5 L0,10 Z" fill="#94a3b8" />
+                            </marker>
+                        </defs>
+                        <!-- Publisher -->
+                        <rect x="20" y="80" width="100" height="80" rx="10" fill="white" stroke="#e2e8f0" stroke-width="2" />
+                        <text x="70" y="125" text-anchor="middle" font-size="12" font-weight="bold" fill="#475569">媒體網站</text>
+                        <!-- ADX -->
+                        <rect x="300" y="40" width="200" height="160" rx="15" fill="#0f172a" />
+                        <text x="400" y="125" text-anchor="middle" font-size="18" font-weight="900" fill="white">AD EXCHANGE</text>
+                        <!-- DSPs -->
+                        <rect x="650" y="20" width="120" height="40" rx="5" fill="#38bdf8" />
+                        <text x="710" y="45" text-anchor="middle" font-size="10" font-weight="bold" fill="white">DSP Alpha</text>
+                        <rect x="650" y="100" width="120" height="40" rx="5" fill="#38bdf8" />
+                        <text x="710" y="125" text-anchor="middle" font-size="10" font-weight="bold" fill="white">DSP Beta</text>
+                        <rect x="650" y="180" width="120" height="40" rx="5" fill="#38bdf8" />
+                        <text x="710" y="205" text-anchor="middle" font-size="10" font-weight="bold" fill="white">DSP Gamma</text>
+                        <!-- Lines -->
+                        <path d="M 120 120 L 290 120" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+                        <path d="M 500 100 L 640 50" stroke="#94a3b8" stroke-dasharray="4" marker-end="url(#arrow)" />
+                        <path d="M 500 120 L 640 120" stroke="#94a3b8" stroke-dasharray="4" marker-end="url(#arrow)" />
+                        <path d="M 500 140 L 640 190" stroke="#94a3b8" stroke-dasharray="4" marker-end="url(#arrow)" />
+                    </svg>
+                    <p class="text-center text-[10px] text-slate-400 mt-2">註：ADX 負責並行廣播請求並收集數千個響應進行最終決標</p>
+                </div>
+
+                <div class="theory-box border-red-100 bg-red-50/30">
+                    <h4 class="font-bold text-red-900 mb-3 uppercase">二、深度分析：ADX 的核心職能</h4>
+                    <div class="detail-text space-y-4">
+                        <p><strong>1. 流量清洗 (IVT Filtering)：</strong> Google AdX 等平台會利用龐大的機器學習庫，在轉發 OpenRTB 請求前，先剔除無效的 Bot 流量，確保買方買到的不是假人。</p>
+                        <p><strong>2. 二次價格與首價拍賣：</strong> 早期 ADX 採用二次價格（Second-Price），得標者付「第二名 + $0.01」。現在為了提高媒體收益，Google 等多數已轉向<strong>首價拍賣 (First-Price)</strong>，成交價格即為出價。</p>
+                        <p><strong>3. 封閉拍賣與 PMP (Private Marketplace)：</strong> 利用 OpenRTB 中的 <code>pmp</code> 物件，ADX 可以針對特定廣告主開放特定版位。這讓高端媒體（如紐約時報）能確保其品牌安全與溢價空間。</p>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-900 rounded-xl">
+                    <p class="text-xs text-slate-400 mb-2">Google AdX 專屬欄位範例：</p>
+                    <code class="text-blue-400 text-xs">"ext": { "google_query_id": "...", "ad_slot_id": 12345 }</code>
+                </div>
+
+                <div class="ref-box">
+                    <h5 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest"><i class="fa-solid fa-book-bookmark mr-2"></i> 參考文件與規範</h5>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://developers.google.com/authorized-buyers/rtb/openrtb-guide" target="_blank" class="hover:text-blue-600 underline">Google Authorized Buyers OpenRTB Guide</a></li>
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://docs.magnite.com/rtb-basics/" target="_blank" class="hover:text-blue-600 underline">Magnite (Rubicon Project) RTB Implementation Docs</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 4: 基礎交易型 -->
+        <section id="step-4" class="step-section">
+            <h2 class="h2-title">應用模式二：基礎交易型系統</h2>
+            <div class="glass-card">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="px-4 py-1 bg-blue-100 text-blue-600 rounded-lg font-black text-sm">典型代表：PopIn, Outbrain, Taboola</div>
+                </div>
+
+                <h3 class="h3-title">一、簡述：非典型 RTB 的借鑑者</h3>
+                <p class="detail-text mb-8">
+                    許多聯播網（Ad Network）並不是真正的「交易所」，但它們借用了 OpenRTB 的通訊協定來擴充自己的買方生態。
+                </p>
+
+                <div class="diagram-container">
+                    <h4 class="text-xs font-bold text-slate-500 mb-4 text-center uppercase tracking-widest">基礎交易型 (Network) 架構圖</h4>
+                    <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg" class="w-full">
+                        <rect x="20" y="80" width="100" height="80" rx="10" fill="white" stroke="#e2e8f0" stroke-width="2" />
+                        <text x="70" y="125" text-anchor="middle" font-size="12" font-weight="bold" fill="#475569">媒體網頁</text>
+                        <!-- Ad Network -->
+                        <rect x="300" y="40" width="200" height="160" rx="15" fill="#1e293b" />
+                        <text x="400" y="90" text-anchor="middle" font-size="16" font-weight="900" fill="white">AD NETWORK</text>
+                        <rect x="320" y="110" width="160" height="70" rx="8" fill="#334155" />
+                        <text x="400" y="135" text-anchor="middle" font-size="10" fill="#94a3b8">內部出價引擎</text>
+                        <text x="400" y="155" text-anchor="middle" font-size="9" fill="#94a3b8">(自有預算優先)</text>
+                        <!-- External DSP -->
+                        <rect x="650" y="100" width="120" height="40" rx="5" fill="#64748b" />
+                        <text x="710" y="125" text-anchor="middle" font-size="10" font-weight="bold" fill="white">外部 RTB DSP</text>
+                        <!-- Lines -->
+                        <path d="M 120 120 L 290 120" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+                        <path d="M 500 120 L 640 120" stroke="#94a3b8" stroke-dasharray="8" marker-end="url(#arrow)" />
+                        <text x="570" y="110" text-anchor="middle" font-size="10" fill="#E31C22" font-weight="bold">補底流量</text>
+                    </svg>
+                    <p class="text-center text-[10px] text-slate-400 mt-2">註：此模式中 OpenRTB 僅作為「溢出流量」或「外部填充」的接口</p>
+                </div>
+
+                <div class="theory-box border-blue-100 bg-blue-50/30">
+                    <h4 class="font-bold text-blue-900 mb-3 uppercase">二、深度分析：為什麼它們用 OpenRTB？</h4>
+                    <div class="detail-text space-y-4">
+                        <p><strong>1. 擴充買方多樣性：</strong> 以 PopIn 為例，雖然主要透過自家的推薦引擎運算內容廣告，但為了提高「填補率 (Fill Rate)」，它們會將剩餘流量透過 OpenRTB 接口發送給外部 DSP（如 The Trade Desk）。</p>
+                        <p><strong>2. 降低串接門檻：</strong> 對外部買方來說，PopIn 只要宣告自己支援 OpenRTB 2.5，買方就不需要額外開發，能直接使用現有的投標伺服器進行出價。</p>
+                        <p><strong>3. 核心差異：</strong> ADX 通常是中立的，而基礎交易型聯播網通常擁有自己的預算池，OpenRTB 只是它們的「備援路徑」。</p>
+                    </div>
+                </div>
+
+                <div class="ref-box">
+                    <h5 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest"><i class="fa-solid fa-book-bookmark mr-2"></i> 參考文件與規範</h5>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://help.taboola.com/hc/en-us/articles/360003503114-Taboola-OpenRTB-Overview" target="_blank" class="hover:text-blue-600 underline">Taboola OpenRTB API Overview</a></li>
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://www.outbrain.com/help/advertisers/real-time-bidding/" target="_blank" class="hover:text-blue-600 underline">Outbrain RTB for Advertisers Guide</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 5: 實戰物件模型 -->
+        <section id="step-5" class="step-section">
+            <h2 class="h2-title">實務開發：OpenRTB 2.5 物件全解析</h2>
+            <div class="glass-card">
+                <p class="mb-8 detail-text">
+                    開發一個 DSP 或 SSP，你必須精確理解 JSON 中每一層級的意義。以下是經過實務開發總結的核心結構：
+                </p>
+
+                <h4 class="h3-title"><i class="fa-solid fa-layer-group text-red-500"></i> 1. 第一層級：BidRequest 根物件</h4>
+                <div class="json-display">
+                    {<br>
+                    &nbsp;&nbsp;<b>"id"</b>: <i>"unique_req_id_123"</i>, <span class="text-gray-500">// 追蹤拍賣的唯一辨識碼</span><br>
+                    &nbsp;&nbsp;<b>"at"</b>: 1, <span class="text-gray-500">// 拍賣類型 (1=一價, 2=二價)</span><br>
+                    &nbsp;&nbsp;<b>"tmax"</b>: 100, <span class="text-gray-500">// 逾時限制 (毫秒)</span><br>
+                    &nbsp;&nbsp;<b>"imp"</b>: [...], <span class="text-gray-500">// 曝光細節</span><br>
+                    &nbsp;&nbsp;<b>"site"</b>: {...}, <span class="text-gray-500">// 網頁資訊</span><br>
+                    &nbsp;&nbsp;<b>"device"</b>: {...}, <span class="text-gray-500">// 設備資訊</span><br>
+                    &nbsp;&nbsp;<b>"user"</b>: {...} <span class="text-gray-500">// 用戶標籤</span><br>
+                    }
+                </div>
+
+                <h4 class="h3-title mt-12"><i class="fa-solid fa-mobile-screen text-blue-500"></i> 2. 設備物件 (Device) 的開發細節</h4>
+                <div class="detail-text mb-6">
+                    在行動端廣告中，<code>device</code> 物件是定價的關鍵。你必須從 HTTP Header 中解析出：
+                </div>
+                <div class="json-display">
+                    <b>"device"</b>: {<br>
+                    &nbsp;&nbsp;<b>"ua"</b>: <i>"Mozilla/5.0..."</i>, <span class="text-gray-500">// 瀏覽器特徵</span><br>
+                    &nbsp;&nbsp;<b>"ip"</b>: <i>"123.123.123.123"</i>,<br>
+                    &nbsp;&nbsp;<b>"geo"</b>: { <b>"country"</b>: <i>"TWN"</i>, <b>"city"</b>: <i>"Taipei"</i> },<br>
+                    &nbsp;&nbsp;<b>"ifa"</b>: <i>"IDFA-FOR-IOS-OR-AAID-FOR-ANDROID"</i>, <span class="text-red-400">// 極重要：行動標識碼</span><br>
+                    &nbsp;&nbsp;<b>"os"</b>: <i>"iOS"</i>, <b>"osv"</b>: <i>"15.4"</i><br>
+                    &nbsp;&nbsp;}
+                </div>
+
+                <h4 class="h3-title mt-12"><i class="fa-solid fa-video text-green-500"></i> 3. 影音物件 (Video) 的深度細節</h4>
+                <p class="detail-text mb-4">如果是影音廣告，<code>imp</code> 裡面會包含 <code>video</code> 物件：</p>
+                <div class="json-display">
+                    <b>"video"</b>: {<br>
+                    &nbsp;&nbsp;<b>"mimes"</b>: [<i>"video/mp4"</i>],<br>
+                    &nbsp;&nbsp;<b>"minduration"</b>: 5, <b>"maxduration"</b>: 30,<br>
+                    &nbsp;&nbsp;<b>"protocols"</b>: [2, 3, 5, 6], <span class="text-gray-500">// 支援 VAST 2.0~4.0</span><br>
+                    &nbsp;&nbsp;<b>"linearity"</b>: 1, <span class="text-gray-500">// 線性(插播)或非線性</span><br>
+                    &nbsp;&nbsp;<b>"skip"</b>: 1 <span class="text-gray-500">// 是否允許跳過</span><br>
+                    &nbsp;&nbsp;}
+                </div>
+
+                <div class="ref-box">
+                    <h5 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest"><i class="fa-solid fa-book-bookmark mr-2"></i> 參考文件與規範</h5>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://iabtechlab.com/wp-content/uploads/2016/07/OpenRTB-API-Specification-Version-2-5-FINAL.pdf" target="_blank" class="hover:text-blue-600 underline">OpenRTB 2.5 官方完整規格書 (PDF)</a></li>
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://iabtechlab.com/standards/adcom/" target="_blank" class="hover:text-blue-600 underline">AdCOM 1.0 (OpenRTB 3.0 的物件基礎)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 6: 反欺詐 -->
+        <section id="step-6" class="step-section">
+            <h2 class="h2-title">實務開發：數位廣告的信任防線</h2>
+            <div class="glass-card">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div>
+                        <h3 class="h3-title"><i class="fa-solid fa-file-shield text-red-500"></i> ads.txt 驗證邏輯</h3>
+                        <div class="detail-text">
+                            <p><strong>原理：</strong> 媒體在根目錄放置一個文本文件，內容如 <code>google.com, pub-12345, DIRECT, f08c47fec0942fa0</code>。</p>
+                            <p><strong>開發實作：</strong> DSP 在收到 BidRequest 後，系統應查詢該 Site 物件的 domain。如果廣播過來的 Publisher ID 不在該網域的 ads.txt 清單中，系統必須直接捨棄出價。這能有效阻止 <strong>Domain Spoofing (網域偽造)</strong>。</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="h3-title"><i class="fa-solid fa-link text-blue-500"></i> supply_chain (Schain)</h3>
+                        <div class="detail-text">
+                            <p><strong>原理：</strong> 追蹤流量經過了多少手轉發。</p>
+                            <p><strong>深度分析：</strong> OpenRTB 2.5 擴充了 <code>schain</code> 物件. 如果你發現一筆流量經過了 5 個中介商才傳到你這裡，它的價格通常被灌水了，且來源不可信。買方通常會透過此欄位進行 <strong>SPO (供應鏈優化)</strong>。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ref-box">
+                    <h5 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest"><i class="fa-solid fa-book-bookmark mr-2"></i> 參考文件與規範</h5>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://iabtechlab.com/ads-txt/" target="_blank" class="hover:text-blue-600 underline">IAB Tech Lab - Authorized Digital Sellers (ads.txt) 規範</a></li>
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://github.com/InteractiveAdvertisingBureau/openrtb/blob/master/supplychainobject.md" target="_blank" class="hover:text-blue-600 underline">SupplyChain Object 實作細節說明</a></li>
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://iabtechlab.com/sellers-json/" target="_blank" class="hover:text-blue-600 underline">Sellers.json 規範 (對應 Schain 的賣方身分驗證)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 7: 高效能串接 -->
+        <section id="step-7" class="step-section">
+            <h2 class="h2-title">實務開發：萬次 QPS 的系統架構</h2>
+            <div class="glass-card">
+                <h3 class="h3-title">一、極致的 QPS 處理能力</h3>
+                <div class="detail-text mb-8">
+                    在 OpenRTB 的世界，延遲就是金錢。如果你的伺服器響應超過 100ms，ADX 會直接斷開連接，你連「看」到流量的機會都沒有。
+                </div>
+                <div class="space-y-12">
+                    <div class="border-b pb-8">
+                        <h4 class="font-black text-xl mb-4 text-slate-800">1. 無狀態 (Stateless) 與分散式架構</h4>
+                        <p class="detail-text">你的 Bidder (投標程序) 必須是無狀態的。透過 AWS 或 GCP 的負載平衡器將流量導流到數十台甚至數百台節點。所有的用戶數據 (User ID Mapping) 必須存在分散式快取如 <strong>Redis</strong> 中，而非資料庫。</p>
+                    </div>
+                    <div class="border-b pb-8">
+                        <h4 class="font-black text-xl mb-4 text-slate-800">2. JSON 的序列化陷阱</h4>
+                        <p class="detail-text">在處理數萬次 QPS 時，傳統的 JSON 庫（如 Python 的預設 json）會消耗大量的 CPU。在 Java 開發中，通常會使用 <strong>Jackson</strong> 並進行預解析優化。</p>
+                    </div>
+                    <div class="border-b pb-8">
+                        <h4 class="font-black text-xl mb-4 text-slate-800">3. 宏替換 (Macro Replacement) 邏輯</h4>
+                        <p class="detail-text">這是實作中最容易出錯的地方。你需要確保你的 <code>adm</code> (廣告代碼) 中包含了追蹤像素，且這些像素正確嵌入了價格宏。</p>
+                    </div>
+                </div>
+
+                <div class="ref-box">
+                    <h5 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest"><i class="fa-solid fa-book-bookmark mr-2"></i> 參考文件與規範</h5>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://redislabs.com/solutions/use-cases/advertising-technology/" target="_blank" class="hover:text-blue-600 underline">Redis for AdTech: 高效能 User Profile 存取架構</a></li>
+                        <li><i class="fa-solid fa-link mr-2"></i><a href="https://github.com/google/openrtb" target="_blank" class="hover:text-blue-600 underline">Google OpenRTB Java/Protobuf Library (效能優化參考)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 8: 即時模擬 -->
+        <section id="step-8" class="step-section">
+            <h2 class="h2-title">實務演練：高性能 RTB 競價模擬器</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-200">
+                    <div id="sim-status" class="text-xs font-bold text-slate-400 mb-6 uppercase tracking-widest">System Ready - Waiting for Broadcaster</div>
+                    <div class="h-64 bg-slate-900 rounded-2xl flex items-center justify-center border-4 border-slate-800 mb-8 overflow-hidden" id="ad-view">
+                        <div class="text-center">
+                            <i class="fa-solid fa-microchip text-slate-700 text-5xl mb-4 animate-pulse"></i>
+                            <p class="text-slate-500 font-mono text-xs">AWAITING ADM RENDERING...</p>
+                        </div>
+                    </div>
+                    <button onclick="runSim()" id="sim-btn" class="w-full py-5 bg-red-600 text-white rounded-xl font-black shadow-xl hover:bg-red-700 active:scale-95 transition-all flex items-center justify-center gap-4">
+                        <i class="fa-solid fa-satellite-dish"></i> 發起 OpenRTB 2.5 廣播
+                    </button>
+                    <div class="mt-6 flex justify-around text-xs text-slate-400 font-bold uppercase">
+                        <div id="qps-tag">Current QPS: 0</div>
+                        <div id="latency-tag">Latency: 0ms</div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <div class="flex justify-between px-2">
+                        <span class="font-black text-xs text-slate-500 uppercase">Incoming BidResponse</span>
+                        <span class="text-xs text-blue-500 font-bold">PROTO: JSON/HTTP</span>
+                    </div>
+                    <div class="json-display h-[450px] overflow-auto shadow-inner" id="sim-res">
+                        <span class="opacity-20">// Output console initialized...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ref-box max-w-2xl mx-auto">
+                <h5 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-widest"><i class="fa-solid fa-book-bookmark mr-2"></i> 模擬與測試工具</h5>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li><i class="fa-solid fa-link mr-2"></i><a href="https://rtbkit.org/" target="_blank" class="hover:text-blue-600 underline">RTBkit - Open Source RTB Framework</a></li>
+                    <li><i class="fa-solid fa-link mr-2"></i><a href="https://bidder.dev/" target="_blank" class="hover:text-blue-600 underline">Bidder.dev - RTB Bidder Testing Environment</a></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function showStep(n) {
+            const target = document.getElementById('step-' + n);
+            if (!target) return;
+            document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+            target.classList.add('active');
+            
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            const allItems = Array.from(document.querySelectorAll('.menu-item'));
+            const activeMenu = allItems.find(item => item.getAttribute('onclick') === `showStep(${n})`);
+            if (activeMenu) activeMenu.classList.add('active');
+            
+            document.querySelector('.main-content').scrollTop = 0;
+        }
+
+        function runSim() {
+            const btn = document.getElementById('sim-btn');
+            const status = document.getElementById('sim-status');
+            const view = document.getElementById('ad-view');
+            const resBox = document.getElementById('sim-res');
+            const qpsTag = document.getElementById('qps-tag');
+            const latencyTag = document.getElementById('latency-tag');
+            
+            btn.disabled = true;
+            status.innerText = "AUCTIONING... BROADCASTING BIDREQUEST TO 500+ ENDPOINTS";
+            status.style.color = "#E31C22";
+            resBox.innerHTML = "<div class='text-blue-400 animate-pulse'>[TCP_HANDSHAKE] Establishing connection...<br>[JSON_PARSE] Sending 1.2KB Payload...</div>";
+            
+            const start = Date.now();
+
+            setTimeout(() => {
+                const latency = Math.floor(Math.random() * 30) + 12;
+                qpsTag.innerText = "Current QPS: 125,482";
+                latencyTag.innerText = `Latency: ${latency}ms`;
+
+                const res = { 
+                    id: "rtb_sim_" + Date.now(), 
+                    seatbid: [{ 
+                        seat: "THE_TRADE_DESK",
+                        bid: [{ 
+                            price: 4.82, 
+                            impid: "imp_1",
+                            adm: `<div style='background:#1e293b; color:white; padding:40px; border-radius:20px; text-align:center; border:2px solid #E31C22; box-shadow:0 0 30px rgba(227,28,34,0.4)'>
+                                    <div style='font-size:10px; color:#E31C22; font-weight:900; margin-bottom:10px;'>OPENRTB SUCCESSFUL WIN</div>
+                                    <h2 style='font-size:24px; font-weight:900;'>實戰：$4.82 CPM 得標</h2>
+                                    <p style='font-size:12px; margin-top:15px; opacity:0.6'>ADM 物件已成功解碼並渲染</p>
+                                    <div style='margin-top:20px; font-family:monospace; font-size:9px; background:rgba(0,0,0,0.3); padding:10px;'>Tracked: /win-notice?price=4.82</div>
+                                  </div>` 
+                        }] 
+                    }] 
+                };
+                
+                resBox.innerHTML = `<pre>${JSON.stringify(res, null, 2)}</pre>`;
+                view.innerHTML = res.seatbid[0].bid[0].adm;
+                status.innerText = "SUCCESS: 200 OK - AD RENDERED";
+                status.style.color = "#10b981";
+                btn.disabled = false;
+            }, 800);
+        }
+    </script>
+</body>
+</html>
