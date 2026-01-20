@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AWS 全球加速技術深度解析</title>
+    <!-- 使用 Tailwind CSS CDN 提供現代化 UI 樣式 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 使用 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      @keyframes dash {
+        to {
+          stroke-dashoffset: -20;
+        }
+      }
+      .animate-dash {
+        stroke-dasharray: 5;
+        animation: dash 1s linear infinite;
+      }
+      .scenario-content {
+        display: none;
+      }
+      .scenario-content.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 p-4 md:p-8 font-sans text-slate-900">
+    <div class="max-w-4xl mx-auto">
+      <!-- 標題區域 -->
+      <header class="mb-8">
+        <div class="flex items-center gap-3 mb-2">
+          <i data-lucide="globe" class="text-orange-500 w-8 h-8"></i>
+          <h1 class="text-3xl font-bold tracking-tight">
+            AWS 全球加速技術深度解析
+          </h1>
+        </div>
+        <p class="text-slate-500 max-w-2xl">
+          為什麼您的 Global Accelerator (GA)
+          設定好後連線變快了，但整體回應時間卻沒大幅下降？
+          透過這個互動頁面，我們來拆解每一毫秒的去向。
+        </p>
+      </header>
+
+      <!-- 分頁按鈕導覽 -->
+      <div
+        class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6"
+        id="tab-container"
+      >
+        <button
+          onclick="switchTab('direct')"
+          id="btn-direct"
+          class="tab-btn p-3 rounded-xl text-sm font-medium transition-all duration-200 border-2 bg-white border-orange-500 shadow-sm text-orange-600 translate-y-[-2px]"
+        >
+          1. 直接連線 (公網)
+        </button>
+        <button
+          onclick="switchTab('ga')"
+          id="btn-ga"
+          class="tab-btn p-3 rounded-xl text-sm font-medium transition-all duration-200 border-2 bg-slate-100 border-transparent text-slate-500 hover:bg-slate-200"
+        >
+          2. Global Accelerator
+        </button>
+        <button
+          onclick="switchTab('cf')"
+          id="btn-cf"
+          class="tab-btn p-3 rounded-xl text-sm font-medium transition-all duration-200 border-2 bg-slate-100 border-transparent text-slate-500 hover:bg-slate-200"
+        >
+          3. CloudFront (Cache)
+        </button>
+        <button
+          onclick="switchTab('multi')"
+          id="btn-multi"
+          class="tab-btn p-3 rounded-xl text-sm font-medium transition-all duration-200 border-2 bg-slate-100 border-transparent text-slate-500 hover:bg-slate-200"
+        >
+          4. 本地部署 (新加坡)
+        </button>
+      </div>
+
+      <!-- 主要內容區域 -->
+      <div
+        class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden mb-8"
+      >
+        <div class="p-6 md:p-8" id="content-body">
+          <!-- 動態注入內容 -->
+          <div id="scenario-info">
+            <div
+              class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6"
+            >
+              <div>
+                <span
+                  id="badge"
+                  class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-100 text-red-700"
+                >
+                  現狀：最慢且不穩定
+                </span>
+                <h2
+                  id="scenario-title"
+                  class="text-2xl font-bold text-slate-800 mt-2"
+                >
+                  1. 直接連線 (公網)
+                </h2>
+              </div>
+              <div class="flex items-center gap-2 text-slate-400">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+                <span class="text-sm">模擬實測數據</span>
+              </div>
+            </div>
+
+            <p id="scenario-desc" class="text-slate-600 mb-8 leading-relaxed">
+              封包在複雜的公網中跳轉。每一次 TCP
+              握手都必須跨越海洋到達東京，導致連線建立極慢。
+            </p>
+
+            <!-- 視覺化圖表 -->
+            <div class="mb-8">
+              <div
+                class="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-2"
+              >
+                <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                數據路徑視覺化
+              </div>
+              <div
+                id="diagram-container"
+                class="relative w-full h-48 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden flex items-center justify-around px-8"
+              >
+                <!-- SVG 將由 JS 注入 -->
+              </div>
+            </div>
+
+            <!-- 數據網格 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div class="text-xs font-bold text-slate-400 mb-1">
+                  建立連線時間 (TCP)
+                </div>
+                <div
+                  id="stat-tcp"
+                  class="text-2xl font-mono font-bold text-blue-600"
+                >
+                  0.0700s (70ms)
+                </div>
+                <div class="text-[10px] text-slate-400 mt-1">
+                  握手、建立連線通道
+                </div>
+              </div>
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div class="text-xs font-bold text-slate-400 mb-1">
+                  首字節時間 (TTFB)
+                </div>
+                <div
+                  id="stat-ttfb"
+                  class="text-2xl font-mono font-bold text-orange-600"
+                >
+                  0.1450s (145ms)
+                </div>
+                <div class="text-[10px] text-slate-400 mt-1">
+                  Request 跑完傳輸 + 處理
+                </div>
+              </div>
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div class="text-xs font-bold text-slate-400 mb-1">
+                  預估總耗時
+                </div>
+                <div
+                  id="stat-total"
+                  class="text-2xl font-mono font-bold text-slate-800"
+                >
+                  0.1451s
+                </div>
+                <div class="text-[10px] text-slate-400 mt-1">
+                  完整請求生命週期
+                </div>
+              </div>
+            </div>
+
+            <!-- 績效指標 -->
+            <div class="flex flex-wrap gap-4 border-t border-slate-100 pt-6">
+              <div class="flex items-center gap-2">
+                <i data-lucide="layers" class="text-slate-400 w-4.5 h-4.5"></i>
+                <span class="text-sm font-medium text-slate-700"
+                  >加速效率:</span
+                >
+                <span id="efficiency" class="text-sm font-bold text-slate-600"
+                  >低</span
+                >
+              </div>
+              <div class="flex items-center gap-2">
+                <i
+                  data-lucide="activity"
+                  class="text-slate-400 w-4.5 h-4.5"
+                ></i>
+                <span class="text-sm font-medium text-slate-700"
+                  >連線穩定度:</span
+                >
+                <span id="stability" class="text-sm font-bold text-slate-600"
+                  >差 (受公網抖動影響)</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 建議區塊 -->
+      <div class="bg-slate-800 rounded-2xl p-8 text-white">
+        <div class="flex items-center gap-3 mb-6">
+          <i data-lucide="alert-circle" class="text-orange-400 w-6 h-6"></i>
+          <h3 class="text-xl font-bold">給 AdTech / 即時競價業務的建議</h3>
+        </div>
+
+        <div class="space-y-6">
+          <div class="flex gap-4">
+            <div
+              class="w-8 h-8 rounded-lg bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-orange-400 text-sm"
+            >
+              1
+            </div>
+            <div>
+              <h4 class="font-bold mb-1 text-base">
+                GA 解決的是「門檻」，不是「路程」
+              </h4>
+              <p class="text-slate-400 text-sm">
+                您的測試數據中 TCP 從 67ms 降到 0.8ms，代表 GA
+                已經幫你把「開門」的時間縮到最短了。剩下的延遲主要是物理距離的跨海路程。
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div
+              class="w-8 h-8 rounded-lg bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-orange-400 text-sm"
+            >
+              2
+            </div>
+            <div>
+              <h4 class="font-bold mb-1 text-base">物理距離是硬傷</h4>
+              <p class="text-slate-400 text-sm">
+                如果您需要 50ms 內完成 bid.json
+                請求，任何網路優化都無法打破光速限制。<b>「本地部署」</b>是您唯一的終極方案。
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div
+              class="w-8 h-8 rounded-lg bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-orange-400 text-sm"
+            >
+              3
+            </div>
+            <div>
+              <h4 class="font-bold mb-1 text-base">善用 HTTP Keep-Alive</h4>
+              <p class="text-slate-400 text-sm">
+                在廣告競價環境，確保客戶端重複使用 TCP
+                連線。只要連線不中斷，您連那 0.8ms 的握手時間都不必花。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-8 pt-6 border-t border-slate-700 flex justify-between items-center"
+        >
+          <p class="text-xs text-slate-500 italic">
+            由 AWS 網路架構分析助手生成
+          </p>
+          <button
+            onclick="switchTab('multi')"
+            class="text-orange-400 flex items-center gap-1 text-sm font-bold hover:text-orange-300 transition-colors"
+          >
+            查看最強解法 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 情境數據定義
+      const scenarios = {
+        direct: {
+          title: "1. 直接連線 (公網)",
+          badge: "現狀：最慢且不穩定",
+          badgeClass: "bg-red-100 text-red-700",
+          desc: "封包在複雜的公網中跳轉。每一次 TCP 握手都必須跨越海洋到達東京，導致連線建立極慢。",
+          tcp: "0.0700s (70ms)",
+          ttfb: "0.1450s (145ms)",
+          total: "0.1451s",
+          efficiency: "低",
+          stability: "差 (受公網抖動影響)",
+          diagram: "direct",
+        },
+        ga: {
+          title: "2. Global Accelerator",
+          badge: "優化：協定加速、骨幹穩定",
+          badgeClass: "bg-blue-100 text-blue-700",
+          desc: "GA 在離你最近的邊緣站點（新加坡）直接回應 TCP 握手。雖然數據仍需跑回東京，但避開了不穩定的公網，走 AWS 專屬光纖。",
+          tcp: "0.0008s (0.8ms)",
+          ttfb: "0.1370s (137ms)",
+          total: "0.1372s",
+          efficiency: "中 (解決握手延遲)",
+          stability: "極佳 (走 AWS 內部骨幹)",
+          diagram: "ga",
+        },
+        cf: {
+          title: "3. CloudFront (Cache)",
+          badge: "優化：消滅物理距離",
+          badgeClass: "bg-purple-100 text-purple-700",
+          desc: "如果內容是可快取的，CloudFront 會直接在新加坡節點回傳數據，完全不需要去東京，這是最快的反應方式。",
+          tcp: "0.0010s (1ms)",
+          ttfb: "0.0120s (12ms)",
+          total: "0.0121s",
+          efficiency: "極高 (適用於快取內容)",
+          stability: "極佳",
+          diagram: "cf",
+        },
+        multi: {
+          title: "4. 本地部署 (新加坡)",
+          badge: "終極解法：物理距離縮短",
+          badgeClass: "bg-green-100 text-green-700",
+          desc: "將伺服器直接搬到使用者旁邊。這是對「動態內容、即時競價」最有效的加速手段，沒有之一。",
+          tcp: "0.0005s (0.5ms)",
+          ttfb: "0.0250s (25ms)",
+          total: "0.0251s",
+          efficiency: "最高 (動態內容首選)",
+          stability: "極佳",
+          diagram: "multi",
+        },
+      };
+
+      // 切換分頁邏輯
+      function switchTab(id) {
+        const data = scenarios[id];
+
+        // 更新 UI 內容
+        document.getElementById("scenario-title").innerText = data.title;
+        document.getElementById("badge").innerText = data.badge;
+        document.getElementById("badge").className =
+          `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${data.badgeClass}`;
+        document.getElementById("scenario-desc").innerText = data.desc;
+        document.getElementById("stat-tcp").innerText = data.tcp;
+        document.getElementById("stat-ttfb").innerText = data.ttfb;
+        document.getElementById("stat-total").innerText = data.total;
+        document.getElementById("efficiency").innerText = data.efficiency;
+        document.getElementById("efficiency").className =
+          `text-sm font-bold ${data.efficiency === "最高" ? "text-green-600" : "text-slate-600"}`;
+        document.getElementById("stability").innerText = data.stability;
+        document.getElementById("stability").className =
+          `text-sm font-bold ${data.stability.includes("極佳") ? "text-green-600" : "text-slate-600"}`;
+
+        // 更新按鈕樣式
+        document.querySelectorAll(".tab-btn").forEach((btn) => {
+          btn.className =
+            "tab-btn p-3 rounded-xl text-sm font-medium transition-all duration-200 border-2 bg-slate-100 border-transparent text-slate-500 hover:bg-slate-200";
+        });
+        const activeBtn = document.getElementById("btn-" + id);
+        activeBtn.className =
+          "tab-btn p-3 rounded-xl text-sm font-medium transition-all duration-200 border-2 bg-white border-orange-500 shadow-sm text-orange-600 translate-y-[-2px]";
+
+        // 更新圖表
+        renderDiagram(id);
+      }
+
+      // 渲染圖表 SVG
+      function renderDiagram(type) {
+        const container = document.getElementById("diagram-container");
+        let svgContent = "";
+
+        const userNode = `
+                <div class="flex flex-col items-center z-10">
+                    <div class="w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center border-2 border-slate-300">
+                        <i data-lucide="wifi" class="text-slate-600 w-5 h-5"></i>
+                    </div>
+                    <span class="text-[10px] mt-2 font-medium">新加坡用戶</span>
+                </div>
+            `;
+
+        const originNode = `
+                <div class="flex flex-col items-center z-10 opacity-60">
+                    <div class="w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center border-2 border-slate-300">
+                        <i data-lucide="server" class="text-slate-600 w-5 h-5"></i>
+                    </div>
+                    <span class="text-[10px] mt-2 font-medium">東京後端</span>
+                </div>
+            `;
+
+        if (type === "direct") {
+          svgContent = `
+                    <svg class="absolute inset-0 w-full h-full">
+                        <path d="M 150 100 Q 300 150 450 80 Q 600 20 750 100" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,5" class="animate-pulse" />
+                        <text x="50%" y="85%" text-anchor="middle" class="fill-red-500 text-[10px]">公網多跳路徑 (跳轉多、易掉包)</text>
+                    </svg>
+                    ${userNode} ${originNode}
+                `;
+        } else if (type === "ga") {
+          svgContent = `
+                    <svg class="absolute inset-0 w-full h-full">
+                        <line x1="20%" y1="50%" x2="40%" y2="50%" stroke="#3b82f6" stroke-width="3" class="animate-dash" />
+                        <line x1="40%" y1="50%" x2="80%" y2="50%" stroke="#60a5fa" stroke-width="2" />
+                        <circle cx="40%" cy="50%" r="6" fill="#1e40af" />
+                        <text x="40%" y="40%" text-anchor="middle" class="fill-blue-800 text-[10px] font-bold">GA 邊緣節點 (TCP 終止)</text>
+                        <text x="60%" y="60%" text-anchor="middle" class="fill-blue-400 text-[10px]">AWS 骨幹專線 (穩定但有距離)</text>
+                    </svg>
+                    ${userNode} ${originNode}
+                `;
+        } else if (type === "cf") {
+          svgContent = `
+                    <svg class="absolute inset-0 w-full h-full">
+                        <line x1="20%" y1="50%" x2="40%" y2="50%" stroke="#a855f7" stroke-width="3" />
+                        <circle cx="40%" cy="50%" r="8" fill="#7e22ce" />
+                        <text x="40%" y="40%" text-anchor="middle" class="fill-purple-800 text-[10px] font-bold">CloudFront 邊緣節點</text>
+                        <text x="40%" y="65%" text-anchor="middle" class="fill-purple-600 text-[10px]">Cache Hit! 直接回傳</text>
+                    </svg>
+                    ${userNode} ${originNode}
+                `;
+        } else if (type === "multi") {
+          svgContent = `
+                    <svg class="absolute inset-0 w-full h-full">
+                        <line x1="20%" y1="50%" x2="40%" y2="50%" stroke="#22c55e" stroke-width="4" />
+                        <circle cx="40%" cy="50%" r="8" fill="#15803d" />
+                        <text x="40%" y="40%" text-anchor="middle" class="fill-green-800 text-[10px] font-bold">新加坡本地 EC2</text>
+                        <text x="30%" y="60%" text-anchor="middle" class="fill-green-600 text-[10px]">極短距離傳輸</text>
+                    </svg>
+                    ${userNode} <div class="w-12"></div>
+                `;
+        }
+
+        container.innerHTML = svgContent;
+        // 重新初始化圖表內的圖標
+        lucide.createIcons();
+      }
+
+      // 初始化頁面
+      window.onload = () => {
+        lucide.createIcons();
+        switchTab("ga"); // 預設顯示 GA 分頁
+      };
+    </script>
+  </body>
+</html>
