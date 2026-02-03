@@ -1,0 +1,359 @@
+import React, { useState } from 'react';
+import { 
+  Rocket, 
+  Book, 
+  FolderTree, 
+  Cpu, 
+  ShieldCheck, 
+  History, 
+  Terminal, 
+  ChevronRight, 
+  Copy, 
+  Check,
+  Zap,
+  Layers,
+  Code2
+} from 'lucide-react';
+
+const App = () => {
+  const [activeTab, setActiveTab] = useState('philosophy');
+  const [copiedText, setCopiedText] = useState('');
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(text);
+    setTimeout(() => setCopiedText(''), 2000);
+  };
+
+  const sections = [
+    { id: 'philosophy', title: '核心哲學', icon: <Zap size={20} /> },
+    { id: 'structure', title: '目錄結構', icon: <FolderTree size={20} /> },
+    { id: 'pipeline', title: '開發流水線', icon: <Cpu size={20} /> },
+    { id: 'maintenance', title: '維護機制', icon: <ShieldCheck size={20} /> },
+    { id: 'snapshot', title: '進度快照', icon: <History size={20} /> },
+    { id: 'tools', title: '工具指令', icon: <Terminal size={20} /> },
+  ];
+
+  const CopyButton = ({ text }) => (
+    <button 
+      onClick={() => handleCopy(text)}
+      className="flex items-center gap-1 text-xs bg-slate-700 hover:bg-slate-600 transition-colors px-2 py-1 rounded border border-slate-500 text-slate-300"
+    >
+      {copiedText === text ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+      {copiedText === text ? '已複製' : '複製指令'}
+    </button>
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-purple-500/30">
+      {/* Header */}
+      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-600 rounded-lg shadow-lg shadow-purple-500/20">
+              <Rocket className="text-white" size={24} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                Antigravity Vibecoding
+              </h1>
+              <p className="text-xs text-slate-500">Laravel + Vue 極速開發指南</p>
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-4 text-sm text-slate-400">
+            <span className="flex items-center gap-1"><Book size={16}/> v1.0 Docs</span>
+            <span className="h-4 w-[1px] bg-slate-800"></span>
+            <span className="text-purple-400 font-medium">Gemini 2.5 Ready</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row gap-8">
+        {/* Sidebar */}
+        <aside className="w-full md:w-64 flex-shrink-0">
+          <nav className="space-y-1">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveTab(section.id)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  activeTab === section.id 
+                  ? 'bg-purple-600/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(147,51,234,0.1)]' 
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900 border border-transparent'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  {section.icon}
+                  {section.title}
+                </div>
+                {activeTab === section.id && <ChevronRight size={16} />}
+              </button>
+            ))}
+          </nav>
+
+          <div className="mt-8 p-4 bg-slate-900 rounded-2xl border border-slate-800">
+            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">當前狀態</h3>
+            <div className="flex items-center gap-2 text-sm text-green-400 mb-2">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+              並行代理：Active
+            </div>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Gemini 已載入上下文，隨時準備執行意圖驅動指令。
+            </p>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0">
+          <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 shadow-sm">
+            
+            {/* 1. Philosophy */}
+            {activeTab === 'philosophy' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <Zap className="text-yellow-400" /> 核心開發哲學
+                </h2>
+                <div className="grid gap-6">
+                  {[
+                    { title: "意圖驅動 (Intent-Driven)", desc: "你定義「為什麼」與「做什麼」，AI 負責技術細節「怎麼做」。" },
+                    { title: "文件即真理 (Docs as Truth)", desc: "Code 是規格的副產品。任何修改必須先在 docs/ 更新規格，再同步程式碼。" },
+                    { title: "並行開發 (Parallel Agents)", desc: "模擬三個角色：架構師 (docs)、後端 (API)、前端 (UI)，透過合約同步。" }
+                  ].map((item, i) => (
+                    <div key={i} className="group p-5 bg-slate-800/50 rounded-2xl border border-slate-700/50 hover:border-purple-500/30 transition-all">
+                      <h4 className="text-purple-400 font-semibold mb-2">{item.title}</h4>
+                      <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 2. Structure */}
+            {activeTab === 'structure' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <FolderTree className="text-blue-400" /> AI-Ready 專案結構
+                </h2>
+                <div className="bg-slate-950 rounded-2xl p-6 font-mono text-sm border border-slate-800 overflow-x-auto">
+                  <div className="space-y-1">
+                    <div className="text-slate-300">/</div>
+                    <div className="flex items-center gap-2 ml-4">
+                      <span className="text-slate-600">├──</span>
+                      <span className="text-green-400 font-bold">GUIDELINES.md</span>
+                      <span className="text-slate-500 italic">// 專案憲法</span>
+                    </div>
+                    <div className="flex items-center gap-2 ml-4">
+                      <span className="text-slate-600">├──</span>
+                      <span className="text-blue-400">docs/</span>
+                      <span className="text-slate-500 italic">// 專案大腦</span>
+                    </div>
+                    <div className="flex items-center gap-2 ml-10">
+                      <span className="text-slate-600">├──</span>
+                      <span className="text-slate-300">user_stories.md</span>
+                    </div>
+                    <div className="flex items-center gap-2 ml-10">
+                      <span className="text-slate-600">├──</span>
+                      <span className="text-slate-300">schema.md</span>
+                    </div>
+                    <div className="flex items-center gap-2 ml-10">
+                      <span className="text-slate-600">├──</span>
+                      <span className="text-slate-300">api_contract.md</span>
+                    </div>
+                    <div className="flex items-center gap-2 ml-10">
+                      <span className="text-slate-600">└──</span>
+                      <span className="text-slate-300">progress.md</span>
+                    </div>
+                    <div className="flex items-center gap-2 ml-4">
+                      <span className="text-slate-600">├──</span>
+                      <span className="text-orange-400">app/Services</span>
+                      <span className="text-slate-500 italic">// 邏輯隔離區</span>
+                    </div>
+                    <div className="flex items-center gap-2 ml-4">
+                      <span className="text-slate-600">└──</span>
+                      <span className="text-pink-400 text-xs">resources/js/types</span>
+                      <span className="text-slate-500 italic text-xs">// 前端型別定義</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-6 text-sm text-slate-500">
+                  ※ 維持此結構能讓 Gemini 在數秒內掌握專案全貌，極大幅度地減少幻覺。
+                </p>
+              </div>
+            )}
+
+            {/* 3. Pipeline */}
+            {activeTab === 'pipeline' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <Cpu className="text-pink-400" /> 三階段極速開發流水線
+                </h2>
+                
+                <div className="space-y-8 relative before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-800">
+                  {/* Step 1 */}
+                  <div className="relative pl-10">
+                    <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-900 border-2 border-slate-700 flex items-center justify-center text-xs font-bold z-10">1</div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-bold text-slate-200">初始化專案憲法 (The Foundation)</h3>
+                    </div>
+                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-slate-500 font-mono">PROMPT:</span>
+                        <CopyButton text="請幫我初始化 GUIDELINES.md。技術棧為 Laravel 11 與 Vue 3 (Composition API)。規範：使用 Service Pattern、強型別、所有 API 需有 Swagger 註解、測試使用 Pest。請確保代碼風格一致。" />
+                      </div>
+                      <p className="text-xs text-slate-400">設定技術棧、命名規範與行為邊界。</p>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="relative pl-10">
+                    <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-900 border-2 border-slate-700 flex items-center justify-center text-xs font-bold z-10">2</div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-bold text-slate-200">產出規格 (Spec Generation)</h3>
+                    </div>
+                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-slate-500 font-mono">PROMPT:</span>
+                        <CopyButton text="我要做 [專案名]。核心功能為 [A, B, C]。請產出 docs/user_stories.md 與 docs/schema.md (Mermaid)。請發揮你的專業補全細節，並列出你的假設供我確認。" />
+                      </div>
+                      <p className="text-xs text-slate-400">讓 AI 生成視覺化的 Mermaid ERD 與使用者故事。</p>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="relative pl-10">
+                    <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-900 border-2 border-slate-700 flex items-center justify-center text-xs font-bold z-10 flex-col leading-none">
+                      <span className="text-[10px]">3</span>
+                    </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-bold text-slate-200">並行實作 (Implementation)</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-3 bg-indigo-900/10 border border-indigo-500/20 rounded-xl">
+                        <h4 className="text-xs font-bold text-indigo-400 mb-2 uppercase">Agent B: 後端</h4>
+                        <p className="text-[10px] text-slate-400">產出 Migration, Service 並導出 TS Interface。</p>
+                      </div>
+                      <div className="p-3 bg-emerald-900/10 border border-emerald-500/20 rounded-xl">
+                        <h4 className="text-xs font-bold text-emerald-400 mb-2 uppercase">Agent C: 前端</h4>
+                        <p className="text-[10px] text-slate-400">根據 TS Interface 實作 Vue 元件與 Store。</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 4. Maintenance */}
+            {activeTab === 'maintenance' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <ShieldCheck className="text-green-400" /> 高效率維護與防衝突
+                </h2>
+                
+                <div className="bg-slate-800/30 rounded-2xl border border-slate-700 p-6 mb-6">
+                  <h3 className="font-bold mb-4 flex items-center gap-2"><Code2 size={18} className="text-purple-400"/> Vibe Check 校準</h3>
+                  <p className="text-sm text-slate-400 mb-4">定期執行此指令，確保文件與程式碼沒有發生偏移：</p>
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 mb-4 relative">
+                    <div className="absolute right-4 top-4">
+                      <CopyButton text="請掃描目前的 app/Services 與 docs/schema.md。是否有任何不一致的地方？如果有，請條列出來並修正，確保程式碼完全符合 GUIDELINES.md。" />
+                    </div>
+                    <p className="text-sm font-mono text-slate-300 pr-20 leading-relaxed">
+                      「請掃描目前的 app/Services 與 docs/schema.md。是否有任何不一致的地方？如果有，請條列出來並修正，確保程式碼完全符合 GUIDELINES.md。」
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-5 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+                    <h4 className="text-sm font-bold text-slate-200 mb-2">文檔先行</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">變更任何邏輯前，必須先在「架構師視窗」更新規格文件，再同步給前後端。</p>
+                  </div>
+                  <div className="p-5 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+                    <h4 className="text-sm font-bold text-slate-200 mb-2">合約制開發</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">前端禁止猜測 API 格式，必須依賴後端更新後的 api_contract.md 或 TS Type。</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 5. Snapshot */}
+            {activeTab === 'snapshot' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <History className="text-orange-400" /> 每日進度快照 (Snapshot)
+                </h2>
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+                  <div className="p-4 bg-slate-800/50 border-b border-slate-800 flex justify-between items-center">
+                    <span className="text-xs font-mono text-slate-400">對話重啟前必執行</span>
+                    <CopyButton text="根據今日開發內容，更新 docs/progress.md。包含：1. 已完成的功能清單。2. 已知但未解決的 Bug。3. 建議下一個開發步驟。" />
+                  </div>
+                  <div className="p-6">
+                    <h4 className="text-sm font-semibold text-purple-400 mb-3">為什麼需要這個？</h4>
+                    <ul className="space-y-3">
+                      {[
+                        "防止對話上下文過長導致 AI 遺忘細節",
+                        "為下一次對話重啟提供完美的起始點",
+                        "清楚掌握目前已驗收 (AC) 與未開發功能"
+                      ].map((li, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-400">
+                          <Check size={16} className="text-green-500 mt-1 flex-shrink-0" />
+                          {li}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 6. Tools */}
+            {activeTab === 'tools' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <Terminal className="text-emerald-400" /> 常用自動化工具指令
+                </h2>
+                <div className="grid gap-4">
+                  {[
+                    { cmd: "composer lint", desc: "格式校準 (需預先配置 php-cs-fixer)" },
+                    { cmd: "php artisan l5-swagger:generate", desc: "根據註解重新生成 API 文件" },
+                    { cmd: "php artisan test", desc: "執行後端單元與整合測試" },
+                    { cmd: "pest", desc: "優雅的測試驅動開發" }
+                  ].map((tool, i) => (
+                    <div key={i} className="group p-4 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between hover:border-slate-600 transition-all">
+                      <div>
+                        <div className="text-emerald-400 font-mono text-sm mb-1">{tool.cmd}</div>
+                        <div className="text-xs text-slate-500">{tool.desc}</div>
+                      </div>
+                      <CopyButton text={tool.cmd} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* Footer Card */}
+          <div className="mt-8 p-6 bg-gradient-to-br from-purple-900/20 to-slate-900 border border-purple-500/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-purple-600/20 rounded-2xl">
+                <Layers className="text-purple-400" size={24} />
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-200">準備好開啟 Antigravity 模式了嗎？</h4>
+                <p className="text-xs text-slate-400">將文件貼給 Gemini，開始你的極速 Vibecoding 旅程。</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setActiveTab('pipeline')}
+              className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-900/20 transition-all active:scale-95"
+            >
+              開始初始化項目
+            </button>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default App;
